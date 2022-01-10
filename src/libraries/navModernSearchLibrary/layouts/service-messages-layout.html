@@ -1,0 +1,216 @@
+{{!--
+# Template designed for service messages
+
+## Example query
+
+```SiteTitle:"Driftsmeldinger" AND RefinableDate01>="today"```
+
+## Selected properties
+
+```ContentTypeId,Description,Path,RefinableDate00,RefinableDate01,RefinableString101,Title```
+
+## Slots
+
+| Slot name  | Slot Field         |
++------------+--------------------+
+| Title      | Title              |
+| PreviewUrl | AutoPreviewUrl     |
+| System     | RefinableString101 |
+| StartDate  | RefinableDate00    |
+| EndDate    | RefinableDate01    |
+| Summary    | Description        |
+
+## URL
+
+https://navno.sharepoint.com/ClientSideAssets/driftsmelding-card.html
+
+--}}
+<content id="data-content">
+    <style>
+        {{#if @root.properties.layoutProperties.showFrame}}
+        .feed-container {
+            background-color: white;
+            box-shadow: {{@root.theme.effects.elevation4}};
+            border-radius: {{@root.theme.effects.roundedCorner2}};
+            padding: 18px 12px;
+            margin-top: {{@root.theme.spacing.s2}};
+        }
+        .feed-container:hover {
+            box-shadow: {{@root.theme.effects.elevation16}};
+        }
+        {{/if}}
+        .feed-items {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+        .feed-item {
+            display: block;
+            margin: 0px 0px {{@root.theme.spacing.m}};
+            padding: 10px 8px;
+            color: {{@root.theme.semanticColors.bodyText}};
+            text-decoration:none;
+            border-radius: {{@root.theme.effects.roundedCorner4}};
+            font-size: {{@root.theme.fonts.medium.fontSize}};
+            font-weight: {{@root.theme.fonts.medium.fontWeight}};
+        }
+        .feed-item:hover {
+            background-color: rgb(234, 234, 234);
+        }
+        .feed-item.informasjon {
+            border: 1px solid {{@root.theme.semanticColors.bodyDivider}};
+        }
+        .feed-item.advarsel,
+        .feed-item.kritisk {
+            background-color: {{@root.theme.semanticColors.warningBackground}};
+            border-left: 4px solid {{@root.theme.semanticColors.warningIcon}};
+            // box-shadow: {{@root.theme.effects.elevation4}};
+        }
+        .feed-item.advarsel:hover {
+            background-color: {{@root.theme.semanticColors.warningHighlight}};
+        }
+        .feed-item.kritisk {
+            background-color: {{@root.theme.semanticColors.errorBackground}};
+            border-left: 4px solid {{@root.theme.semanticColors.errorIcon}};
+        }
+        .feed-item.kritisk:hover {
+            background-color: {{@root.theme.semanticColors.severeWarningBackground}};
+        }
+        .feed-item--header {
+            margin: 0px;
+            font-weight: {{@root.theme.fonts.xLarge.fontWeight}};
+            font-size: 
+                {{#if @root.slots.Summary}}
+                    {{@root.theme.fonts.mediumPlus.fontSize}}
+                {{else}}
+                    {{@root.theme.fonts.medium.fontSize}}
+                {{/if}};
+            color: {{@root.theme.semanticColors.HeaderText}};
+        }
+        .feed-item.kritisk .feed-item--label {
+            color: {{@root.theme.semanticColors.errorText}};
+            background-color: {{@root.theme.semanticColors.errorBackground}};
+        }
+        .feed-item.advarsel .feed-item--label,
+        .feed-item.planlagt .feed-item--label {
+            font-weight: {{@root.theme.fonts.medium.fontWeight}};
+        }
+        .feed-item--label pnp-icon {
+            display: inline-block;
+            vertical-align: -2px;
+        }
+        .feed-item--summary {
+            margin: {{@root.theme.spacing.s1}} 0px;
+        }
+        .feed-item--status {
+            margin: {{@root.theme.spacing.s2}} 0px 0px;
+            color: {{@root.theme.semanticColors.bodySubtext}};
+            font-size: {{@root.theme.fonts.small.fontSize}};
+            // font-weight: {{@root.theme.fonts.xLarge.fontWeight}};
+        }
+        .footer-links {
+            margin-top:{{@root.theme.spacing.m}};
+            display: flex;
+            gap: {{@root.theme.spacing.s1}};
+        }
+        .footer-link {
+            text-decoration: none;
+            color: {{@root.theme.semanticColors.link}};
+            display: inline-block;
+            border: 1px solid {{@root.theme.semanticColors.link}};
+            padding: {{@root.theme.spacing.s1}};
+            border-radius: {{@root.theme.effects.roundedCorner4}};
+            // margin: {{@root.theme.spacing.s2}};
+        }
+        .footer-link:last-of-type {
+            margin-bottom: 0px;
+        }
+        .footer-link:hover {
+            // text-decoration: underline;
+            background-color: rgb(234, 234, 234);
+        }
+    </style>
+    {{#*inline "driftsmelding"}}
+        <li>
+            <a class="feed-item {{lowercase (slot item @root.slots.Priority)}} {{lowercase planlagt}}" href="{{slot item @root.slots.PreviewUrl}}">
+                <h3 class="feed-item--header">
+                    {{#if (eq (slot item @root.slots.Priority) "Kritisk")}}
+                        <span class="feed-item--label">
+                            <pnp-icon data-name="Warning" aria-hidden="true"></pnp-icon>
+                            Kritisk:
+                        </span>
+                    {{/if}}
+                    {{#or (eq (slot item @root.slots.Priority) "Advarsel") planlagt}}
+                        <span class="feed-item--label">
+                            {{#if planlagt}}Planlagt{{else}}{{slot item @root.slots.Priority}}{{/if}}:
+                        </span>
+                    {{/or}}
+                    {{slot item @root.slots.Title}}
+                    </h3>
+                {{#if (slot item @root.slots.Summary)}}<p class="feed-item--summary">{{slot item @root.slots.Summary}}</p>{{/if}}
+                <p class="feed-item--status">
+                    {{#if planlagt}}
+                        Planlagt fra {{getDate (slot item @root.slots.StartDate) "D. MMM"}}–{{getDate (slot this @root.slots.EndDate) "D. MMM"}}
+                    {{else}}
+                        Fra {{getDate (slot item @root.slots.StartDate) "D. MMM"}} Oppdatert {{getDate (slot item @root.slots.ModifiedDate) "D. MMM \k\l. HH.mm"}}.
+                    {{/if}}
+                </p>
+            </a>
+        </li>
+    {{/inline}}
+    <div class="feed-container">
+    <ul class="feed-items">
+    {{#if data.items.length}}
+        {{!-- Kritisk --}}
+        {{#each data.items as |item|}}
+            {{#if (and 
+                (eq (slot item @root.slots.Priority) "Kritisk")
+                (moment (slot item @root.slots.StartDate) lang="nb" isSameOrBefore=(moment lang="nb" format="YYYY-MM-DD"))
+            )}}
+                {{> driftsmelding item=item}}
+            {{/if}}
+        {{/each}}
+        {{!-- Advarsel --}}
+        {{#each data.items as |item|}}
+            {{#if (and 
+                (eq (slot item @root.slots.Priority) "Advarsel")
+                (moment (slot item @root.slots.StartDate) lang="nb" isSameOrBefore=(moment lang="nb" format="YYYY-MM-DD"))
+            )}}
+                {{> driftsmelding item=item}}
+            {{/if}}
+        {{/each}}
+        {{!-- Informasjon --}}
+        {{#each data.items as |item|}}
+            {{#if (and 
+                (eq (slot item @root.slots.Priority) "Informasjon")
+                (moment (slot item @root.slots.StartDate) lang="nb" isSameOrBefore=(moment lang="nb" format="YYYY-MM-DD"))
+            )}}
+                {{> driftsmelding item=item}}
+            {{/if}}
+        {{/each}}
+        {{!-- Planlagte --}}
+        {{#withSort data.items prop="RefinableDate00" reverse=true}}
+            {{#if 
+                (moment (slot this @root.slots.StartDate) lang="nb" isAfter=(moment lang="nb" format="YYYY-MM-DD"))
+            }}
+                {{> driftsmelding item=this planlagt="Planlagt"}}
+            {{/if}}
+        {{/withSort}}
+    {{else}}
+        <li>Ingen aktive eller planlagte driftsmeldinger.</li>
+    {{/if}}
+    </ul>
+    {{#if @root.properties.layoutProperties.showLinks}}
+    <div class="footer-links">
+        <a class="footer-link" href="https://navno.sharepoint.com/sites/intranett-driftsmeldinger">
+            Vis tidligere driftsmeldinger
+        </a>
+        <a class="footer-link" href="https://jira.adeo.no/plugins/servlet/desk">
+            Meld feil i Porten
+        </a>
+    </div>
+    {{/if}}
+    </div>
+</content>
+<content id="placeholder-content">
+</content>
