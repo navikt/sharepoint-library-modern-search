@@ -6,6 +6,7 @@ import {
 export interface IServiceMessagesLayoutProperties {
   showLinks: boolean;
   showFrame: boolean;
+  showSummary: boolean;
 }
 
 export class ServiceMessageslayout extends BaseLayout<IServiceMessagesLayoutProperties> {
@@ -13,6 +14,7 @@ export class ServiceMessageslayout extends BaseLayout<IServiceMessagesLayoutProp
   public onInit(): void | Promise<void> {
     this.properties.showLinks = this.properties.showLinks === undefined ? false : this.properties.showLinks;
     this.properties.showFrame = this.properties.showFrame === undefined ? false : this.properties.showFrame;
+    this.properties.showSummary = this.properties.showSummary === undefined ? false : this.properties.showSummary;
     super.onInit();
   }
 
@@ -24,6 +26,9 @@ export class ServiceMessageslayout extends BaseLayout<IServiceMessagesLayoutProp
       }),
       PropertyPaneToggle('layoutProperties.showFrame', {
         label: 'Vis ramme',
+      }),
+      PropertyPaneToggle('layoutProperties.showSummary', {
+        label: 'Vis sammendrag',
       }),
     ];
   }

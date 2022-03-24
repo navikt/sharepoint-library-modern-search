@@ -7,18 +7,19 @@
 
 ## Selected properties
 
-```ContentTypeId,Description,Path,RefinableDate00,RefinableDate01,RefinableString101,Title```
+```Title,Description,DefaultEncodingURL,RefinableDate00,RefinableDate01,LastModifiedTime,PzlSeverityOWSCHCS,RefinableString103```
 
-## Slots
+| Property           | Meaning      | 
++--------------------+--------------+
+| Title              | Title        |
+| Description        | Summary      |
+| DefaultEncodingURL | Path         |
+| RefinableDate00    | Start date   |
+| RefinableDate01    | End date     |
+| LastModifiedTime   | Last updated |
+| PzlSeverityOWSCHCS | Priority     |
+| RefinableString103 | System       |
 
-| Slot name  | Slot Field         |
-+------------+--------------------+
-| Title      | Title              |
-| PreviewUrl | AutoPreviewUrl     |
-| System     | RefinableString101 |
-| StartDate  | RefinableDate00    |
-| EndDate    | RefinableDate01    |
-| Summary    | Description        |
 
 ## URL
 
@@ -64,7 +65,6 @@ https://navno.sharepoint.com/ClientSideAssets/driftsmelding-card.html
         .feed-item.kritisk {
             background-color: {{@root.theme.semanticColors.warningBackground}};
             border-left: 4px solid {{@root.theme.semanticColors.warningIcon}};
-            // box-shadow: {{@root.theme.effects.elevation4}};
         }
         .feed-item.advarsel:hover {
             background-color: {{@root.theme.semanticColors.warningHighlight}};
@@ -80,7 +80,7 @@ https://navno.sharepoint.com/ClientSideAssets/driftsmelding-card.html
             margin: 0px;
             font-weight: {{@root.theme.fonts.xLarge.fontWeight}};
             font-size: 
-                {{#if @root.slots.Summary}}
+                {{#if @root.properties.layoutProperties.showSummary}}
                     {{@root.theme.fonts.mediumPlus.fontSize}}
                 {{else}}
                     {{@root.theme.fonts.medium.fontSize}}
@@ -126,33 +126,32 @@ https://navno.sharepoint.com/ClientSideAssets/driftsmelding-card.html
             margin-bottom: 0px;
         }
         .footer-link:hover {
-            // text-decoration: underline;
             background-color: rgb(234, 234, 234);
         }
     </style>
     {{#*inline "driftsmelding"}}
         <li>
-            <a class="feed-item {{lowercase (slot item @root.slots.Priority)}} {{lowercase planlagt}}" href="{{slot item @root.slots.PreviewUrl}}">
+            <a class="feed-item {{lowercase this.PzlSeverityOWSCHCS}} {{lowercase planlagt}}" href="{{slot this @root.slots.PreviewUrl}}">
                 <h3 class="feed-item--header">
-                    {{#if (eq (slot item @root.slots.Priority) "Kritisk")}}
+                    {{#if (eq this.PzlSeverityOWSCHCS "Kritisk")}}
                         <span class="feed-item--label">
                             <pnp-icon data-name="Warning" aria-hidden="true"></pnp-icon>
                             Kritisk:
                         </span>
                     {{/if}}
-                    {{#or (eq (slot item @root.slots.Priority) "Advarsel") planlagt}}
+                    {{#or (eq this.PzlSeverityOWSCHCS "Advarsel") planlagt}}
                         <span class="feed-item--label">
-                            {{#if planlagt}}Planlagt{{else}}{{slot item @root.slots.Priority}}{{/if}}:
+                            {{#if planlagt}}Planlagt{{else}}{{this.PzlSeverityOWSCHCS}}{{/if}}:
                         </span>
                     {{/or}}
-                    {{slot item @root.slots.Title}}
+                    {{slot this @root.slots.Title}}
                     </h3>
-                {{#if (slot item @root.slots.Summary)}}<p class="feed-item--summary">{{slot item @root.slots.Summary}}</p>{{/if}}
+                {{#if @root.properties.layoutProperties.showSummary}}<p class="feed-item--summary">{{this.Description}}</p>{{/if}}
                 <p class="feed-item--status">
                     {{#if planlagt}}
-                        Planlagt fra {{getDate (slot item @root.slots.StartDate) "D. MMM"}}–{{getDate (slot this @root.slots.EndDate) "D. MMM"}}
+                        Planlagt fra {{getDate this.RefinableDate00 "D. MMM"}}–{{getDate this.RefinableDate01 "D. MMM"}}
                     {{else}}
-                        Fra {{getDate (slot item @root.slots.StartDate) "D. MMM"}} Oppdatert {{getDate (slot item @root.slots.ModifiedDate) "D. MMM \k\l. HH.mm"}}.
+                        Fra {{getDate this.RefinableDate00 "D. MMM"}} Oppdatert {{getDate this.LastModifiedTime "D. MMM \k\l. HH.mm"}}.
                     {{/if}}
                 </p>
             </a>
@@ -162,38 +161,38 @@ https://navno.sharepoint.com/ClientSideAssets/driftsmelding-card.html
     <ul class="feed-items">
     {{#if data.items.length}}
         {{!-- Kritisk --}}
-        {{#each data.items as |item|}}
-            {{#if (and 
-                (eq (slot item @root.slots.Priority) "Kritisk")
-                (moment (slot item @root.slots.StartDate) lang="nb" isSameOrBefore=(moment lang="nb" format="YYYY-MM-DD"))
-            )}}
-                {{> driftsmelding item=item}}
-            {{/if}}
-        {{/each}}
-        {{!-- Advarsel --}}
-        {{#each data.items as |item|}}
-            {{#if (and 
-                (eq (slot item @root.slots.Priority) "Advarsel")
-                (moment (slot item @root.slots.StartDate) lang="nb" isSameOrBefore=(moment lang="nb" format="YYYY-MM-DD"))
-            )}}
-                {{> driftsmelding item=item}}
-            {{/if}}
-        {{/each}}
-        {{!-- Informasjon --}}
-        {{#each data.items as |item|}}
-            {{#if (and 
-                (eq (slot item @root.slots.Priority) "Informasjon")
-                (moment (slot item @root.slots.StartDate) lang="nb" isSameOrBefore=(moment lang="nb" format="YYYY-MM-DD"))
-            )}}
-                {{> driftsmelding item=item}}
-            {{/if}}
-        {{/each}}
+            {{#withSort data.items "RefinableDate00" reverse=true}}
+                {{#if (and 
+                    (eq this.PzlSeverityOWSCHCS "Kritisk")
+                    (moment this.RefinableDate00 lang="nb" isSameOrBefore=(moment lang="nb" format="YYYY-MM-DD"))
+                )}}
+                    {{> driftsmelding}}
+                {{/if}}
+            {{/withSort}}
+            {{!-- Advarsel --}}
+            {{#withSort data.items "RefinableDate00" reverse=true}}
+                {{#if (and 
+                    (eq this.PzlSeverityOWSCHCS "Advarsel")
+                    (moment this.RefinableDate00 lang="nb" isSameOrBefore=(moment lang="nb" format="YYYY-MM-DD"))
+                )}}
+                    {{> driftsmelding}}
+                {{/if}}
+            {{/withSort}}
+            {{!-- Informasjon --}}
+            {{#withSort data.items "RefinableDate00" reverse=true}}
+                {{#if (and 
+                    (eq this.PzlSeverityOWSCHCS "Informasjon")
+                    (moment this.RefinableDate00 lang="nb" isSameOrBefore=(moment lang="nb" format="YYYY-MM-DD"))
+                )}}
+                    {{> driftsmelding}}
+                {{/if}}
+            {{/withSort}}
         {{!-- Planlagte --}}
-        {{#withSort data.items prop="RefinableDate00" reverse=true}}
+        {{#withSort data.items "RefinableDate00" reverse=false}}
             {{#if 
-                (moment (slot this @root.slots.StartDate) lang="nb" isAfter=(moment lang="nb" format="YYYY-MM-DD"))
+                (moment this.RefinableDate00 lang="nb" isAfter=(moment lang="nb" format="YYYY-MM-DD"))
             }}
-                {{> driftsmelding item=this planlagt="Planlagt"}}
+               {{> driftsmelding planlagt="Planlagt"}}
             {{/if}}
         {{/withSort}}
     {{else}}

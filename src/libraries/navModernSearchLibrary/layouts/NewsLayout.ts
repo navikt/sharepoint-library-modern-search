@@ -19,7 +19,6 @@ export class Newslayout extends BaseLayout<INewsLayoutProperties> {
     
     // Initializes the property if not defined
     // this.properties.myTextProperty = this.properties.myTextProperty !== null ? this.properties.myTextProperty : "Default value";
-    
     return [
       PropertyPaneToggle('layoutProperties.showImage', {
         label: 'Vis bilde',
