@@ -133,7 +133,7 @@ https://navno.sharepoint.com/ClientSideAssets/driftsmelding-card.html
             background-color: rgb(234, 234, 234);
         }
     </style>
-    {{#*inline "driftsmelding"}}
+    {{#*inline "serviceMessage"}}
         <li>
             <a class="feed-item {{lowercase this.PzlSeverityOWSCHCS}}" href="{{slot this @root.slots.PreviewUrl}}">
                 <h3 class="feed-item--header">
@@ -147,8 +147,8 @@ https://navno.sharepoint.com/ClientSideAssets/driftsmelding-card.html
                 </h3>
                 {{#if @root.properties.layoutProperties.showSummary}}<p class="feed-item--summary">{{this.Description}}</p>{{/if}}
                 <p class="feed-item--status">
-                    {{#if planlagt}}
-                        Planlagt fra {{getDate this.RefinableDate00 "D. MMM"}}–{{getDate this.RefinableDate01 "D. MMM"}}
+                    {{#if planned}}
+                        Planlagt fra {{getDate this.RefinableDate00 "D. MMM"}}–{{chop (getDate this.RefinableDate01 "D. MMM")}}.
                     {{else}}
                         Fra {{chop (getDate this.RefinableDate00 "D. MMM")}}. Oppdatert {{getDate this.LastModifiedTime "D. MMM \k\l. HH.mm"}}.
                     {{/if}}
@@ -162,7 +162,7 @@ https://navno.sharepoint.com/ClientSideAssets/driftsmelding-card.html
                 {{#if this.active.length}}
                     <ul class="feed-items">
                     {{#each this.active}}
-                        {{> driftsmelding}}
+                        {{> serviceMessage}}
                     {{/each}}
                     </ul>
                 {{/if}}
@@ -170,7 +170,7 @@ https://navno.sharepoint.com/ClientSideAssets/driftsmelding-card.html
                     <h2>Planlagt vedlikehold</h2>
                     <ul class="feed-items">
                     {{#each this.planned}}
-                        {{> driftsmelding planlagt=1}}
+                        {{> serviceMessage planned=1}}
                     {{/each}}
                     </ul>
                 {{/if}}
