@@ -22,7 +22,7 @@
         "@webcomponents/custom-elements": "1.4.3",
         "@webcomponents/webcomponentsjs": "2.5.0",
         "handlebars": "4.7.7",
-        "moment": "^2.29.2",
+        "moment": "^2.29.4",
         "office-ui-fabric-react": "7.156.0",
         "react": "16.9.0",
         "react-dom": "16.9.0",
